@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hello-chain-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "projects/03-hello-chain/web",
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "anvil",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "PATH=\"$HOME/.foundry/bin:$PATH\" exec anvil --port 8545 --block-time 2"
+      ],
+      "port": 8545
+    }
+  ]
+}

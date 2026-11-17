@@ -1,0 +1,25 @@
+# Book repo — reference only, has its own .git
+Ethereum-Smart-Contract-Development/
+
+# SDD scratch
+.superpowers/
+
+# Node / Next
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+
+# Foundry
+cache/
+broadcast/*/31337/
+
+# Env
+.env
+.env.*
+!.env.example
+
+.DS_Store
+.remember/

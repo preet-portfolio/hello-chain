@@ -1,0 +1,181 @@
+# CI for projects/03-hello-chain, the on-chain guestbook.
+# Four independent jobs: contracts (format, build, tests, gas snapshot), formal (Halmos proofs),
+# analyze (Slither) and web (lint, types, unit tests, production build, Playwright E2E on anvil).
+name: hello-chain
+
+on:
+  push:
+    paths:
+      - "projects/03-hello-chain/**"
+      - ".github/workflows/hello-chain.yml"
+  pull_request:
+    paths:
+      - "projects/03-hello-chain/**"
+      - ".github/workflows/hello-chain.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hello-chain-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Pinned: forge 1.9 runs tests in isolation mode by default, which the committed .gas-snapshot
+  # and the gas tests depend on. Bump together with a fresh snapshot.
+  FOUNDRY_VERSION: v1.9.0
+  FOUNDRY_DISABLE_NIGHTLY_WARNING: "1"
+
+jobs:
+  contracts:
+    name: contracts (fmt, build, test, gas snapshot)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/03-hello-chain/contracts
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: ${{ env.FOUNDRY_VERSION }}
+
+      - run: forge --version
+
+      - name: Format
+        run: forge fmt --check
+
+      - name: Build
+        run: forge build --sizes
+
+      # foundry.toml seeds fuzzing for reproducible local runs; CI explores fresh inputs on every run.
+      # The seed is printed so a failure can be replayed with `forge test --fuzz-seed <seed>`.
+      - name: Test (ci profile, 10k fuzz runs, random seed)
+        run: |
+          SEED="0x$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          echo "fuzz seed: $SEED"
+          FOUNDRY_PROFILE=ci forge test --fuzz-seed "$SEED"
+
+      # Deterministic tests only: fuzz, invariant and Halmos tests are excluded from the snapshot.
+      - name: Gas snapshot
+        run: forge snapshot --check --no-match-path 'test/Guestbook.Invariant.t.sol' --no-match-test 'testFuzz_|invariant_|check_'
+
+  formal:
+    name: formal (halmos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: projects/03-hello-chain/contracts
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: ${{ env.FOUNDRY_VERSION }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install halmos==0.3.3
+
+      # Settings come from halmos.toml (loop = 141) and foundry.toml (dynamic_test_linking = false).
+      - name: Halmos proofs
+        run: halmos --contract GuestbookHalmosTest
+
+  analyze:
+    name: analyze (slither)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/03-hello-chain/contracts
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: ${{ env.FOUNDRY_VERSION }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install slither-analyzer==0.11.6
+
+      # slither.config.json filters lib/, test/ and script/. Low/informational findings are triaged in
+      # notes/ch03-hello-world.md; any medium or high finding fails the job.
+      - name: Slither
+        run: slither . --fail-medium
+
+  web:
+    name: web (lint, types, unit, build, e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: projects/03-hello-chain/web
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive # the E2E setup deploys the contract, which imports OpenZeppelin
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: projects/03-hello-chain/web/package.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: projects/03-hello-chain/web/pnpm-lock.yaml
+
+      # anvil + forge for the E2E stack (anvil :8546, forge script deploy, next start :3100).
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: ${{ env.FOUNDRY_VERSION }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Unit tests
+        run: pnpm test
+
+      # Build what the E2E run tests: the local anvil chain, not the Base Sepolia default.
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_CHAIN_ID: "31337"
+          NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
+
+      - name: Built CSS contains design tokens
+        run: pnpm check:css
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E (Playwright + anvil)
+        run: pnpm test:e2e
+
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: projects/03-hello-chain/web/test-results
+          if-no-files-found: ignore
+          retention-days: 7

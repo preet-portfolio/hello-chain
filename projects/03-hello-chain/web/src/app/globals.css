@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+/*
+ * Hello, Chain: warm "paper and ink" with a single vermilion accent, like a seal on a page.
+ * Every text/background pair below is >= 4.5:1 (WCAG AA) in both themes; the lowest is
+ * accent on paper in light mode at 5.3:1. Tokens only: components never hard-code a colour.
+ */
+:root {
+  color-scheme: light dark;
+  --paper: #f6f1e7;
+  --surface: #fffcf6;
+  --ink: #1f1b16;
+  --muted: #5c554b;
+  --line: #e2d9c8;
+  --line-strong: #c9bda8;
+  --accent: #b23a0e;
+  --accent-ink: #ffffff;
+  --accent-soft: #f6dccd;
+  --ok: #2d6a37;
+  --danger: #a3271b;
+  --shadow: 0 1px 0 rgb(31 27 22 / 0.04), 0 12px 32px -16px rgb(31 27 22 / 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #131210;
+    --surface: #1c1a17;
+    --ink: #efe8db;
+    --muted: #ada395;
+    --line: #2f2b25;
+    --line-strong: #4a443b;
+    --accent: #ff9466;
+    --accent-ink: #1b0d05;
+    --accent-soft: #3a2117;
+    --ok: #86d394;
+    --danger: #ff8f80;
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 16px 40px -20px rgb(0 0 0 / 0.7);
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok: var(--ok);
+  --color-danger: var(--danger);
+  --shadow-card: var(--shadow);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display-serif);
+
+  /* Type scale (1.25 minor third, rounded): eyebrow, small, body, lead, h3, h2, display. */
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--letter-spacing: 0.14em;
+  --text-lead: 1.1875rem;
+  --text-lead--line-height: 1.6;
+  --text-h3: 1.125rem;
+  --text-h3--line-height: 1.35;
+  --text-h2: clamp(1.875rem, 1.4rem + 2vw, 2.5rem);
+  --text-h2--line-height: 1.1;
+  --text-display: clamp(3rem, 2rem + 5vw, 4.75rem);
+  --text-display--line-height: 0.98;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* One focus style for everything interactive: visible on keyboard focus, in both themes. */
+:where(a, button, textarea, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+:where(button.rounded-full, a.rounded-full):focus-visible {
+  border-radius: 9999px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+/* ---- How it works: the 4-step flow. Vertical timeline on phones, a row from 768px. ---- */
+.flow {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.flow-step {
+  position: relative;
+  padding: 0 0 2rem 3.75rem;
+}
+.flow-step:last-child {
+  padding-bottom: 0;
+}
+.flow-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--accent);
+}
+/* The connector: from below this step's icon to the next step's icon. */
+.flow-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: calc(1.375rem - 1px);
+  top: 3.25rem;
+  bottom: 0.5rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(var(--line-strong), var(--line-strong)) no-repeat;
+}
+@media (min-width: 768px) {
+  .flow {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 1.75rem;
+  }
+  .flow-step {
+    padding: 4rem 0 0 0;
+  }
+  .flow-step:not(:last-child)::before {
+    left: 3.5rem;
+    right: -1.25rem;
+    top: calc(1.375rem - 1px);
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+}
+
+/* ---- Motion: only for people who haven't asked for less of it. ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .rise-2 {
+    animation-delay: 80ms;
+  }
+  .rise-3 {
+    animation-delay: 160ms;
+  }
+  .entry-in {
+    animation: entry-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  /* A "packet" travels the connectors, hinting that a hello moves from step to step. */
+  .flow-step:not(:last-child)::before {
+    background:
+      linear-gradient(var(--accent), var(--accent)) no-repeat,
+      linear-gradient(var(--line-strong), var(--line-strong)) no-repeat;
+    background-size:
+      2px 30%,
+      100% 100%;
+    animation: travel-down 3.2s ease-in-out infinite;
+  }
+  @media (min-width: 768px) {
+    .flow-step:not(:last-child)::before {
+      background-size:
+        30% 2px,
+        100% 100%;
+      animation-name: travel-right;
+    }
+  }
+  .flow-step:nth-child(2)::before {
+    animation-delay: 0.8s;
+  }
+  .flow-step:nth-child(3)::before {
+    animation-delay: 1.6s;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes entry-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes travel-down {
+  0% {
+    background-position:
+      0 -40%,
+      0 0;
+  }
+  60%,
+  100% {
+    background-position:
+      0 140%,
+      0 0;
+  }
+}
+@keyframes travel-right {
+  0% {
+    background-position:
+      -40% 0,
+      0 0;
+  }
+  60%,
+  100% {
+    background-position:
+      140% 0,
+      0 0;
+  }
+}
