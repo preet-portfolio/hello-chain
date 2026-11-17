@@ -1,4 +1,4 @@
-# CI for projects/03-hello-chain, the on-chain guestbook.
+# CI for projects/hello-chain, the on-chain guestbook.
 # Four independent jobs: contracts (format, build, tests, gas snapshot), formal (Halmos proofs),
 # analyze (Slither) and web (lint, types, unit tests, production build, Playwright E2E on anvil).
 name: hello-chain
@@ -6,11 +6,11 @@ name: hello-chain
 on:
   push:
     paths:
-      - "projects/03-hello-chain/**"
+      - "projects/hello-chain/**"
       - ".github/workflows/hello-chain.yml"
   pull_request:
     paths:
-      - "projects/03-hello-chain/**"
+      - "projects/hello-chain/**"
       - ".github/workflows/hello-chain.yml"
   workflow_dispatch:
 
@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 20
     defaults:
       run:
-        working-directory: projects/03-hello-chain/contracts
+        working-directory: projects/hello-chain/contracts
     steps:
       - uses: actions/checkout@v5
         with:
@@ -70,7 +70,7 @@ jobs:
     timeout-minutes: 20
     defaults:
       run:
-        working-directory: projects/03-hello-chain/contracts
+        working-directory: projects/hello-chain/contracts
     steps:
       - uses: actions/checkout@v5
         with:
@@ -96,7 +96,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: projects/03-hello-chain/contracts
+        working-directory: projects/hello-chain/contracts
     steps:
       - uses: actions/checkout@v5
         with:
@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: projects/03-hello-chain/web
+        working-directory: projects/hello-chain/web
     steps:
       - uses: actions/checkout@v5
         with:
@@ -131,13 +131,13 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          package_json_file: projects/03-hello-chain/web/package.json
+          package_json_file: projects/hello-chain/web/package.json
 
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: projects/03-hello-chain/web/pnpm-lock.yaml
+          cache-dependency-path: projects/hello-chain/web/pnpm-lock.yaml
 
       # anvil + forge for the E2E stack (anvil :8546, forge script deploy, next start :3100).
       - uses: foundry-rs/foundry-toolchain@v1
@@ -177,6 +177,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: projects/03-hello-chain/web/test-results
+          path: projects/hello-chain/web/test-results
           if-no-files-found: ignore
           retention-days: 7

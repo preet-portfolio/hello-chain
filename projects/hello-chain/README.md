@@ -32,7 +32,7 @@ Engineering notes (concepts, measurements, design decisions): [notes/ch03-hello-
 anvil
 
 # 2. Deploy and add three sample entries (terminal 2).
-cd projects/03-hello-chain/contracts
+cd projects/hello-chain/contracts
 forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast \
   --private-key <anvil account #0 private key, printed by anvil at startup>
 forge script script/SeedLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
@@ -133,7 +133,7 @@ Set `OWNER=<address>` in front of the deploy command if the owner should differ 
 
 **3. Point the app at it** (from `web/`): `pnpm sync:contract`, then commit `contracts/deployments/84532.json` and `web/src/lib/contract.ts`.
 
-**4. Vercel.** Import the repository with **Root Directory** `projects/03-hello-chain/web` (framework Next.js, install `pnpm install`). Set, for Production:
+**4. Vercel.** Import the repository with **Root Directory** `projects/hello-chain/web` (framework Next.js, install `pnpm install`). Set, for Production:
 
 - `NEXT_PUBLIC_CHAIN_ID=84532`, `NEXT_PUBLIC_RP_ID=<your-project>.vercel.app`
 - `NEXT_PUBLIC_RPC_URL`: a **keyed** Base Sepolia endpoint from an RPC provider, locked to your domain with the provider's allowlist (the key is visible in the browser, so the allowlist is what protects it). Every visitor's browser reads through it and polls for new entries; the public `sepolia.base.org` endpoint is rate-limited and a busy page will hit that limit.

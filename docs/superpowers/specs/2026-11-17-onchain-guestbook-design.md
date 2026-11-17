@@ -56,7 +56,7 @@ The book's code is a concept source and a "before" baseline only. All code, nami
 - Frontend: **Next.js (App Router) + TypeScript + Tailwind**, **viem/wagmi**. Mobile-first, light + dark.
 - Hosting: **Vercel** (owner's account is connected). Relayer runs as a Next.js route handler there.
 - Secrets (relayer private key, RPC URL, deployer key) are supplied by the owner; never committed. `.env.example` documents them.
-- **Repo layout (Claude's call):** one git repo at the workspace root (`Development_ETH_Smart_Contract/`) holding all book projects. CI workflows live at the repo root in `.github/workflows/`, scoped per project with `paths:` filters. The book repo `Ethereum-Smart-Contract-Development/` is git-ignored (it keeps its own `.git`; reference only). Vercel's root directory = `projects/03-hello-chain/web`. A GitHub remote is created by the owner (or with explicit approval).
+- **Repo layout (Claude's call):** one git repo at the workspace root (`Development_ETH_Smart_Contract/`) holding all book projects. CI workflows live at the repo root in `.github/workflows/`, scoped per project with `paths:` filters. The book repo `Ethereum-Smart-Contract-Development/` is git-ignored (it keeps its own `.git`; reference only). Vercel's root directory = `projects/hello-chain/web`. A GitHub remote is created by the owner (or with explicit approval).
 - **Domain (owner's call):** the Vercel production URL (`*.vercel.app`) for now. The WebAuthn `rpId` comes from an env var (`NEXT_PUBLIC_RP_ID`), never hard-coded, so a later move is a config change. Accepted consequence: when the site moves to a custom domain, existing passkeys stop working there and those visitors start fresh. Passkey sign-in works on `localhost` and the production URL; Vercel preview deployments show the page but passkey signing there is not required to work.
 - A local dev server must be running and opened in the browser pane **from the first build step**, so the owner can watch progress.
 
@@ -143,9 +143,9 @@ Errors always in plain language (e.g. "You've already signed today — come back
 
 ### 7.6 Layout
 ```
-.github/workflows/hello-chain.yml   CI, path-filtered to projects/03-hello-chain/**
+.github/workflows/hello-chain.yml   CI, path-filtered to projects/hello-chain/**
 .gitignore                          ignores Ethereum-Smart-Contract-Development/
-projects/03-hello-chain/
+projects/hello-chain/
   contracts/      Foundry project (src, test, script, book-baseline)
   web/            Next.js app (page + /api/relay + shared filter module)
   README.md       how to run, deploy, moderate

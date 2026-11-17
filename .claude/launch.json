@@ -6,7 +6,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--dir",
-        "projects/03-hello-chain/web",
+        "projects/hello-chain/web",
         "dev"
       ],
       "port": 3000

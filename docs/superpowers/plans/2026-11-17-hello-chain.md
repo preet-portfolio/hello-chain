@@ -42,8 +42,8 @@
 ```
 .gitignore                                  ignores Ethereum-Smart-Contract-Development/, node_modules, out, cache, .env*
 .claude/launch.json                         dev-server config for the browser pane
-.github/workflows/hello-chain.yml           CI, paths: projects/03-hello-chain/**
-projects/03-hello-chain/
+.github/workflows/hello-chain.yml           CI, paths: projects/hello-chain/**
+projects/hello-chain/
   README.md                                 run, deploy, moderate
   contracts/
     foundry.toml                            profiles: default, ci (fuzz 10k), book (solc 0.4.26, src=book-baseline)
@@ -85,7 +85,7 @@ notes/ch03-hello-world.md
 ### Task 0: Repo, toolchain and live localhost
 
 **Files:**
-- Create: `.gitignore`, `.claude/launch.json`, `projects/03-hello-chain/web/` (Next.js scaffold), `projects/03-hello-chain/web/src/app/page.tsx`
+- Create: `.gitignore`, `.claude/launch.json`, `projects/hello-chain/web/` (Next.js scaffold), `projects/hello-chain/web/src/app/page.tsx`
 - Test: none (scaffold) — verified by the browser pane.
 
 **Interfaces:**
@@ -93,9 +93,9 @@ notes/ch03-hello-world.md
 
 - [ ] **Step 1:** `git init` at the workspace root; write `.gitignore` (book repo, `node_modules`, `.next`, `out`, `cache`, `broadcast/*/31337`, `.env`, `.env.*` except `.env.example`).
 - [ ] **Step 2:** Install Foundry (`curl -L https://foundry.paradigm.xyz | bash && foundryup`); `pip3 install halmos slither-analyzer`; `brew install cyfrin/tap/aderyn`. Verify: `forge --version`, `halmos --version`, `slither --version`, `aderyn --version` all print.
-- [ ] **Step 3:** Scaffold `web` with `pnpm create next-app@latest web --ts --tailwind --app --src-dir --eslint --use-pnpm --no-import-alias` inside `projects/03-hello-chain/`; add `viem wagmi @tanstack/react-query`, dev deps `vitest @playwright/test`.
+- [ ] **Step 3:** Scaffold `web` with `pnpm create next-app@latest web --ts --tailwind --app --src-dir --eslint --use-pnpm --no-import-alias` inside `projects/hello-chain/`; add `viem wagmi @tanstack/react-query`, dev deps `vitest @playwright/test`.
 - [ ] **Step 4:** Replace `page.tsx` with a "Hello, Chain — being built" placeholder listing the plan's tasks, so the owner sees progress.
-- [ ] **Step 5:** Write `.claude/launch.json` (`name: hello-chain-web`, `pnpm --dir projects/03-hello-chain/web dev`, port 3000); start it with `preview_start` and confirm the placeholder renders.
+- [ ] **Step 5:** Write `.claude/launch.json` (`name: hello-chain-web`, `pnpm --dir projects/hello-chain/web dev`, port 3000); start it with `preview_start` and confirm the placeholder renders.
 - [ ] **Step 6:** Commit `chore: scaffold hello-chain repo and web app`.
 
 ---
@@ -359,9 +359,9 @@ notes/ch03-hello-world.md
 
 ### Task 15: CI, notes, README, deploy
 
-**Files:** Create `.github/workflows/hello-chain.yml`, `projects/03-hello-chain/README.md`, `notes/ch03-hello-world.md`; Modify root `README.md` progress table
+**Files:** Create `.github/workflows/hello-chain.yml`, `projects/hello-chain/README.md`, `notes/ch03-hello-world.md`; Modify root `README.md` progress table
 
-- [ ] **Step 1:** CI jobs (all `paths: projects/03-hello-chain/**`): `contracts` (foundry-toolchain, `forge fmt --check`, `forge build`, `FOUNDRY_PROFILE=ci forge test`, `forge snapshot --check`, book profile test), `formal` (halmos), `analyze` (slither-action, aderyn), `web` (pnpm install, lint, tsc, vitest, playwright with anvil). Validate locally with `act` if available, else YAML lint.
+- [ ] **Step 1:** CI jobs (all `paths: projects/hello-chain/**`): `contracts` (foundry-toolchain, `forge fmt --check`, `forge build`, `FOUNDRY_PROFILE=ci forge test`, `forge snapshot --check`, book profile test), `formal` (halmos), `analyze` (slither-action, aderyn), `web` (pnpm install, lint, tsc, vitest, playwright with anvil). Validate locally with `act` if available, else YAML lint.
 - [ ] **Step 2:** `notes/ch03-hello-world.md`: storage layout (`forge inspect Guestbook storageLayout`), key opcodes of `sign`, predicted vs measured gas table for `sign`/`signWithWallet`/`signWithPasskey` (cold SSTOREs per EIP-2929, string slot writes, LOG costs) with tolerance ±10 % and explained gaps, precompile vs fallback cost for P-256, why private-chain mining is gone post-Merge, analyzer findings.
 - [ ] **Step 3:** Project README: run locally, env vars, deploy, moderate (`forge script script/Hide.s.sol`).
 - [ ] **Step 4 (owner-gated):** with the owner's keys: deploy to Base Sepolia, verify on Sourcify (`forge verify-contract --verifier sourcify`) → "exact match"; set Vercel env vars; deploy `web` to Vercel; fund relayer; sign once from a phone.

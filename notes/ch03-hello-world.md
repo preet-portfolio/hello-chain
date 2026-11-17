@@ -1,6 +1,6 @@
 # Chapter 3 — Hello World of Smart Contracts (reference notes)
 
-> Our own summary of the book's ideas, updated to the 2026 picture, followed by what we measured while building [Hello, Chain](../projects/03-hello-chain/README.md), an on-chain guestbook. The book is a reference only; nothing here is copied into the project.
+> Our own summary of the book's ideas, updated to the 2026 picture, followed by what we measured while building [Hello, Chain](../projects/hello-chain/README.md), an on-chain guestbook. The book is a reference only; nothing here is copied into the project.
 
 ## 1. What the chapter teaches
 
@@ -13,7 +13,7 @@
 | A private chain to play on | Make your own network: write a genesis file (chain id, low difficulty, gas limit), start a node, mine blocks yourself to get test ether, then deploy and call the contract there. | A custom genesis with a tiny difficulty and a node mining locally |
 | Toolchain of the time | Write in a browser IDE, compile with solc 0.4, deploy through a node console or wallet. | Solidity `^0.4.11` |
 
-The counter (`ArithValue`) is the heart of the chapter. In 2026 eyes it has three real bugs, and our project keeps it next to our own contract as a "before" baseline ([BookBaseline.t.sol](../projects/03-hello-chain/contracts/test/BookBaseline.t.sol), which compiles the original with solc 0.4.26):
+The counter (`ArithValue`) is the heart of the chapter. In 2026 eyes it has three real bugs, and our project keeps it next to our own contract as a "before" baseline ([BookBaseline.t.sol](../projects/hello-chain/contracts/test/BookBaseline.t.sol), which compiles the original with solc 0.4.26):
 
 1. **Anyone can reset it.** `setNumber` has no access control (`test_book_anyoneCanReset`).
 2. **It wraps below zero.** Solidity 0.4 arithmetic is unchecked, so decrementing 0 gives 2²⁵⁶−1 (`test_book_decrementWrapsBelowZero`).
@@ -91,7 +91,7 @@ How a `string` is stored decides much of the gas:
 | `forge test` per-test gas (and `.gas-snapshot`) | The whole test function: setup calls, the call under test, view calls and assertions. A regression signal, not a price. |
 | `vm.lastFrameGas()` in forge 1.9 | Forge 1.9 runs tests in **isolation mode by default** (`isolate = true`), so every top-level call is its own transaction and this returns the **full transaction gas**, base and calldata included. We confirmed it on anvil: the receipt of the same `sign("hello")` reported exactly the same 159,735. |
 
-Lesson learned: our first comparison put predicted *execution* gas next to forge's measured *transaction* gas, and every row looked about 15 % too low. The gap was exactly 21,000 + calldata. [Guestbook.Gas.t.sol](../projects/03-hello-chain/contracts/test/Guestbook.Gas.t.sol) now subtracts the intrinsic part it can compute exactly and asserts that execution is within ±10 % of the prediction.
+Lesson learned: our first comparison put predicted *execution* gas next to forge's measured *transaction* gas, and every row looked about 15 % too low. The gap was exactly 21,000 + calldata. [Guestbook.Gas.t.sol](../projects/hello-chain/contracts/test/Guestbook.Gas.t.sol) now subtracts the intrinsic part it can compute exactly and asserts that execution is within ±10 % of the prediction.
 
 ### 5.2 Predicted vs measured
 

@@ -24,4 +24,4 @@ Original, purpose-driven projects inspired by the ideas in *Ethereum Smart Contr
 |---|---|---|---|---|
 | 1 | Blockchain Basics | [notes](notes/ch01-blockchain-basics.md) | — | Concepts captured; project direction not chosen yet |
 | 2 | Grokking Ethereum | — | — | Next |
-| 3 | Hello World of Smart Contracts | [notes](notes/ch03-hello-world.md) | [Hello, Chain](projects/03-hello-chain/README.md): on-chain guestbook with passkey signing | Built & tested locally (CI added); Base Sepolia deploy pending |
+| 3 | Hello World of Smart Contracts | [notes](notes/ch03-hello-world.md) | [Hello, Chain](projects/hello-chain/README.md): on-chain guestbook with passkey signing | Built & tested locally (CI added); Base Sepolia deploy pending |
